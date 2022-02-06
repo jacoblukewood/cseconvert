@@ -11,6 +11,12 @@ cseconvert is a cross platform Python utility script that extracts/converts Sama
 
 ## Installation
 
+Edit the source code (open cseconvert in any text editor) to enter your Component Search Engine account details on line 14 and 15.
+```python
+EMAIL = 'user@example.com'
+PASSWORD = 'password'
+```
+
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requests if not already installed
 
 ```sh
