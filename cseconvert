@@ -1,0 +1,45 @@
+#!/usr/bin/env python2.7
+
+"""Extracts/Converts SamacSys Library Loader/Component Search Engine files for use in PCB editor software.
+Pass the .zip file to extract/convert as the first argument.
+The default output is to a new directory the same directory as the input file. An alternate directory may be supplied as a second argument.
+See https://github.com/jacoblukewood/cseconvert"""
+
+import sys	# standard library
+import zipfile
+from io import BytesIO
+
+import requests	# 3rd party packages
+
+# Component Search Engine account details (register at https://componentsearchengine.com/register)
+EMAIL = ''
+PASSWORD = ''
+
+
+if len(sys.argv) < 2:
+	print("""usage: cseconvert input_zip_file
+       cseconvert input_zip_file ... target_directory""")
+	exit()
+
+
+if not EMAIL or not PASSWORD:
+	print("""Script not configured!
+Enter your Component Search Engine account details on line 14 and 15 inside the source of this script.
+You may register an account at https://componentsearchengine.com/register""")
+	exit()
+
+zip_file = zipfile.ZipFile(sys.argv[1])	# get ZIP file path inputted
+zip_files_list = zip_file.namelist()	# get list of files in zip_file
+epwfile = [x for x in zip_files_list if x[-4:] == ".epw"][0]	# Check the file extention of the ZIP contents to find the .epw file
+
+f = zip_file.open(epwfile)	# extract the EPW file to memory
+part_id = f.readline()	# get the part ID which is stored on line 0
+url = "https://componentsearchengine.com/ga/model.php?partID=" + str(part_id)	# generate URL
+
+raw_cse_response = requests.get(url, auth=(EMAIL, PASSWORD))	# send request and get raw response
+compressed_cse_response = zipfile.ZipFile(BytesIO(raw_cse_response.content))	# set file structure to ZIP
+
+# Extract the ZIP
+for file in compressed_cse_response.namelist():
+    if '/' in file:
+        compressed_cse_response.extract(file, sys.argv[2] if len(sys.argv) > 2 else sys.argv[1][:-4])	# extract to same directory as input unless a second argument is supplied
