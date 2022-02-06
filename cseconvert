@@ -42,4 +42,4 @@ compressed_cse_response = zipfile.ZipFile(BytesIO(raw_cse_response.content))	# s
 # Extract the ZIP
 for file in compressed_cse_response.namelist():
     if '/' in file:
-        compressed_cse_response.extract(file, sys.argv[2] if len(sys.argv) > 2 else sys.argv[1][:-4])	# extract to same directory as input unless a second argument is supplied
+        compressed_cse_response.extract(file, sys.argv[2] if len(sys.argv) > 2 else '.')	# extract to current session directory unless a second argument is supplied
